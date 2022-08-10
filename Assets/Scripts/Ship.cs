@@ -6,6 +6,7 @@ public class Ship : MonoBehaviour {
     /// </summary>
     public Rigidbody2D rb;
     public StarManager Stars;
+    public GameObject[] Flames;
     /// <summary>
     /// maximum speed of the ship
     /// </summary>
@@ -31,6 +32,9 @@ public class Ship : MonoBehaviour {
     /// as well as bound check for the stars
     /// </summary>
     void FixedUpdate() {
+        Flames[0].SetActive(acceleration > 0f);
+        Flames[1].SetActive(rotation < 0f);
+        Flames[2].SetActive(rotation > 0f);
         CalculateVelocity();
         CalculateRotation();
         Stars.CheckStars();
@@ -63,7 +67,7 @@ public class Ship : MonoBehaviour {
         rb.position = new Vector2(0, 0);
         rb.velocity = new Vector2(0, 0);
         rb.angularVelocity = 0;
-        // create a new background
+        // this time the galaxy will look the best it has ever been! 
         Stars.Start();
     }
 }
