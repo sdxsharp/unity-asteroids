@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -90,7 +89,9 @@ public class AsteroidManager : MonoBehaviour {
     /// make sure the givenn asteroid is never heard from again
     /// </summary>
     /// <param name="a">asteroid lost in space or otherwise desintegrated</param>
-    private void RemoveAsteroid(GameObject asteroid) {
+    public void RemoveAsteroid(GameObject asteroid) {
+        // we are not responsible for what ever that supposed asteroid is supposed to be if it's not in the all knowing list
+        if (!Asteroids.Contains(asteroid)) return;
         // substract the androidsmass from the calculation, so we can spawn more asteroids soon
         AsteroidMass -= asteroid.GetComponent<Rigidbody2D>().mass;
         // destroy the game object...

@@ -59,6 +59,8 @@
     <Compile Include="Assets\Scripts\StarManager.cs" />
     <Compile Include="Assets\Scripts\Ship.cs" />
     <Compile Include="Assets\Scripts\AsteroidManager.cs" />
+    <Compile Include="Assets\Scripts\Bullet.cs" />
+    <Compile Include="Assets\Scripts\BulletManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
