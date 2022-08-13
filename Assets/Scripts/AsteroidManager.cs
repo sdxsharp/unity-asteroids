@@ -88,10 +88,39 @@ public class AsteroidManager : MonoBehaviour {
     /// <summary>
     /// make sure the givenn asteroid is never heard from again
     /// </summary>
-    /// <param name="a">asteroid lost in space or otherwise desintegrated</param>
-    public void RemoveAsteroid(GameObject asteroid) {
-        // we are not responsible for what ever that supposed asteroid is supposed to be if it's not in the all knowing list
+    /// <param name="asteroid">asteroid lost in space</param>
+    public void DestroyAsteroid(GameObject asteroid) {
+        // not an asteroid! at this point it can only be the ship! panic! get out of here!
         if (!Asteroids.Contains(asteroid)) return;
+        var a = asteroid.GetComponent<Rigidbody2D>();
+        // make room fo the fragments
+        a.transform.localScale = new Vector3(0, 0, 0);
+        // spawn some smaller asteroids if the mass is big enough
+        if (a.mass > .3f) {
+            // get a random number of fragments, usually 2 but sometimes 3
+            var fragments = Random.Range(2.3f, 3.3f);
+            for (var i = 0; i < fragments; i++) {
+                // spawn the new fragment somewhere random around the center of the destroyed asteroid
+                var go = CreateAsteroid(a.position + Random.insideUnitCircle.normalized * a.mass / fragments, 0);
+                var fragment = go.GetComponent<Rigidbody2D>();
+                // set the same rotation to easily apply the velocity
+                fragment.rotation = a.rotation;
+                // set the mass to the according fraction of the parent mass
+                fragment.mass = a.mass / fragments;
+                // scale the fragments according to their mass
+                // half of the surface would technically be the square root but we're splittng asteroids not hairs!
+                fragment.transform.localScale = new Vector3(fragment.mass, fragment.mass, 1);
+                // remember the fragment and its mass
+                AddAsteroid(go, a.velocity);
+            }
+        }
+        RemoveAsteroid(asteroid);
+    }
+    /// <summary>
+    /// make sure the givenn asteroid is never heard from again
+    /// </summary>
+    /// <param name="a">asteroid lost in space or otherwise desintegrated</param>
+    private void RemoveAsteroid(GameObject asteroid) {
         // substract the androidsmass from the calculation, so we can spawn more asteroids soon
         AsteroidMass -= asteroid.GetComponent<Rigidbody2D>().mass;
         // destroy the game object...
@@ -126,7 +155,7 @@ public class AsteroidManager : MonoBehaviour {
         // remember the milk!
         AsteroidMass += rb.mass;
         // adopt the newly born asteroid so it will stay below the AsteroidManager in hierarchy view
-        a.transform.parent = this.transform;
+        a.transform.parent = transform;
         Asteroids.Add(a);
     }
 }

@@ -19,6 +19,6 @@ public class Bullet : MonoBehaviour {
         // let the bullet manager know that this bullet found its target
         Bullets.DestroyBullet(gameObject);
         // let the asteroid manager know that its time to disintegrate this asteroid
-        Asteroids.RemoveAsteroid(other.gameObject);
+        Asteroids.DestroyAsteroid(other.gameObject);
     }
 }
