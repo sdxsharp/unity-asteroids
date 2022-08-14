@@ -51,9 +51,19 @@ public class AsteroidManager : MonoBehaviour {
     /// </summary>
     private List<GameObject> Asteroids = new List<GameObject>();
     /// <summary>
+    /// counter for 3 different asteroid sizes in radar range
+    /// </summary>
+    private int[] num;
+    /// <summary>
+    /// return the counts of the different asteroid sizes in radar view
+    /// </summary>
+    public string Score { get { return $"Asteroids: {num[0]}/{num[1]}/{num[2]}"; } }
+    /// <summary>
     /// initialy place some asteroids close to the ship with random directions
     /// </summary>
     public void Start() {
+        // iunitialize counter for 3 different asteroid sizes in radar range
+        num = new int[3];
         // just clean up before we try again
         foreach (var a in Asteroids) Destroy(a);
         Asteroids.Clear();
@@ -121,12 +131,15 @@ public class AsteroidManager : MonoBehaviour {
     /// </summary>
     /// <param name="a">asteroid lost in space or otherwise desintegrated</param>
     private void RemoveAsteroid(GameObject asteroid) {
+        var rb = asteroid.GetComponent<Rigidbody2D>();
         // substract the androidsmass from the calculation, so we can spawn more asteroids soon
-        AsteroidMass -= asteroid.GetComponent<Rigidbody2D>().mass;
+        AsteroidMass -= rb.mass;
         // destroy the game object...
         Asteroids.Remove(asteroid);
         // ...and every evidence that it was ever there
         Destroy(asteroid);
+        // determine the size category of the destroyed asteroid and decrease the asteroid count for this size accordingly
+        num[rb.mass < 1f ? (rb.mass > .3f ? 1 : 2) : 0]--;
     }
     /// <summary>
     /// create an asteroid at a random position in some distance
@@ -149,13 +162,15 @@ public class AsteroidManager : MonoBehaviour {
     /// </summary>
     /// <param name="a">asteroid to be remembered forever</param>
     /// <param name="velocity">velocity to be applied to the asteroid</param>
-    private void AddAsteroid(GameObject a, Vector2 velocity) {
-        var rb = a.GetComponent<Rigidbody2D>();
+    private void AddAsteroid(GameObject asteroid, Vector2 velocity) {
+        var rb = asteroid.GetComponent<Rigidbody2D>();
         rb.velocity = velocity * Random.Range(MinSpeed, MaxSpeed);
         // remember the milk!
         AsteroidMass += rb.mass;
         // adopt the newly born asteroid so it will stay below the AsteroidManager in hierarchy view
-        a.transform.parent = transform;
-        Asteroids.Add(a);
+        asteroid.transform.parent = transform;
+        Asteroids.Add(asteroid);
+        // determine the size category of the new asteroid and increase the asteroid count for this size accordingly
+        num[rb.mass < 1f ? (rb.mass > .3f ? 1 : 2) : 0]++;
     }
 }

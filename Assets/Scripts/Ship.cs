@@ -26,6 +26,10 @@ public class Ship : MonoBehaviour {
     /// </summary>
     public Canvas AnyKey;
     /// <summary>
+    /// reference to the HUD
+    /// </summary>
+    public UnityEngine.UI.Text Score;
+    /// <summary>
     /// time in physics update frames until the game can be respawned
     /// </summary>
     public int GameOverTimeout = 200;
@@ -37,6 +41,10 @@ public class Ship : MonoBehaviour {
     /// some random private variables to store state from input update to render time
     /// </summary>
     private float rotation, acceleration, fire;
+    /// <summary>
+    /// counter for the number of collected powerups
+    /// </summary>
+    private int num;
     /// <summary>
     /// record rotation and accelleration controls in frame update
     /// </summary>
@@ -79,17 +87,30 @@ public class Ship : MonoBehaviour {
             // hide the messages
             ResetGame();
         }
+        // display the number of asteroids in radar range, number of bullet hits, and the number of powerups collected
+        Score.text = $"{Asteroids.Score} {Bullets.Score} Powerups: {num}";
     }
     /// <summary>
     /// how to exit vi?!!!
     /// </summary>
     /// <param name="other">that something that hit the ship, should be an asteroid or a fragment thereof</param>
     void OnCollisionEnter2D(Collision2D other) {
-        // enter the game over mode
-        fire = -1;
-        acceleration = rotation = 0;
-        // display the game over text
-        GameOver.enabled = true;
+        var asteroid = other.gameObject;
+        // determine if the asteroid is big enough to cause damage to the ship
+        if (asteroid.GetComponent<Rigidbody2D>().mass > .3f) {
+            // enter the game over mode
+            fire = -1;
+            // ignore inputs
+            acceleration = rotation = 0;
+            // display the game over text
+            GameOver.enabled = true;
+        } else {
+            Asteroids.DestroyAsteroid(asteroid);
+            // spit out an other bullet
+            Bullets.CheckBullets();
+            // increase the number of powerups collectes
+            num++;
+        }
     }
     /// <summary>
     /// calculate the new velocity when up is pressed
@@ -126,5 +147,7 @@ public class Ship : MonoBehaviour {
         Asteroids.Start();
         // delete all bullets
         Bullets.Start();
+        // reset the number of powerups collected
+        num = 0;
     }
 }

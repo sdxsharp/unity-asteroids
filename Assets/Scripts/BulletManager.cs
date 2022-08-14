@@ -20,9 +20,19 @@ public class BulletManager : MonoBehaviour {
     /// </summary>
     private List<GameObject> Bullets = new();
     /// <summary>
+    /// counter for bullet hits
+    /// </summary>
+    private int num;
+    /// <summary>
+    /// return the score for bullet hits
+    /// </summary>
+    public string Score { get { return $"Hits: {num}"; } }
+    /// <summary>
     /// only useful to restart the game
     /// </summary>
     public void Start() {
+        // reset the counter for bullet hits
+        num = 0;
         // destroy all bullet game objects...
         foreach (var b in Bullets) Destroy(b);
         // ...and the references to them
@@ -38,7 +48,7 @@ public class BulletManager : MonoBehaviour {
             // skip if bullet is still inside of ships viewport
             if ((Ship.transform.position - bullet.transform.position).sqrMagnitude < Ship.Viewport * Ship.Viewport) continue;
             // destroy bullets reference from the list and the game object
-            DestroyBullet(bullet);
+            DestroyBullet(bullet, 0);
         }
         // the offset from the ships center of gravity to the tip. yes, I know it's misaligned from the x axis
         var shiptip = new Vector2(0.037f, 0.5f);
@@ -55,9 +65,11 @@ public class BulletManager : MonoBehaviour {
     /// destroy the bullet game object and the reference to it
     /// </summary>
     /// <param name="bullet">gae obkect to be destroyed</param>
-    public void DestroyBullet(GameObject bullet) {
+    public void DestroyBullet(GameObject bullet, int hits = 1) {
         // remove the game object when found in live bullet list
         // (haven't seen this happen, but don't destroy bullets twice. And it looks more sleek)
         if (Bullets.Remove(bullet)) Destroy(bullet);
+        // increase the counter for bullet hits
+        num += hits;
     }
 }
